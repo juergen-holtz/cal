@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	c := cal.NewCalendar(cal.ForMonth(11), cal.ForYear(2023))
+	c, _ := cal.NewCalendar()
 	fmt.Println(c)
 }
