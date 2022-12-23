@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jmh-git/cal"
+	"github.com/juergen-holtz/cal"
 )
 
 func TestNewCalendarCurrentMonthYear(t *testing.T) {
