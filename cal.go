@@ -2,6 +2,7 @@
 package cal
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -12,7 +13,7 @@ type Calendar struct {
 	StartDay int
 }
 
-type CalendarOpts func(c *Calendar)
+type CalendarOpts func(c *Calendar) error
 
 // currentYear and currentMonth are defined here, so they can be set once when the
 // package is initialized.
@@ -40,34 +41,44 @@ func IsLeapYear(year int) bool {
 
 // ForYear is an initializer function to set the calendar's year.
 func ForYear(year int) CalendarOpts {
-	return func(c *Calendar) {
+	return func(c *Calendar) error {
+		if year < 1 {
+			return errors.New("invalid year")
+		}
 		c.Year = year
+		return nil
 	}
 }
 
 // ForMonth is an initializer function to set the calendar's month.
 func ForMonth(month int) CalendarOpts {
-	return func(c *Calendar) {
+	return func(c *Calendar) error {
+		if month < 1 {
+			return errors.New("invalid month")
+		}
 		c.Month = month
+		return nil
 	}
 }
 
 // Constructs a Calendar object with the specified options.c
-func NewCalendar(options ...CalendarOpts) *Calendar {
+func NewCalendar(options ...CalendarOpts) (*Calendar, error) {
 	// If nothing else, construct a calendar for current month and year.
 	c := Calendar{Year: currentYear, Month: currentMonth}
 	for _, opt := range options {
-		opt(&c)
+		err := opt(&c)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Set location
 	loc, err := time.LoadLocation("Local")
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return nil, err
 	}
 	// Set weekday of the 1st (e.g. Tue)
 	c.StartDay = int(time.Date(c.Year, time.Month(c.Month), 1, 0, 0, 0, 0, loc).Weekday())
-	return &c
+	return &c, nil
 }
 
 // Print calendar by implementing the Stringer interface.

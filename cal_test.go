@@ -8,7 +8,11 @@ import (
 )
 
 func TestNewCalendarCurrentMonthYear(t *testing.T) {
-	c := cal.NewCalendar()
+	c, err := cal.NewCalendar()
+	if err != nil {
+		t.Errorf("Unexpected construction error: %s", err.Error())
+		return
+	}
 	want := cal.Calendar{Year: time.Now().Year(), Month: int(time.Now().Month())}
 	if c.Month != want.Month || c.Year != want.Year {
 		t.Errorf("Not current year/month calendar. Want %v, got %v\n", want, c)
@@ -17,7 +21,11 @@ func TestNewCalendarCurrentMonthYear(t *testing.T) {
 
 func TestNewCalendarForMonth(t *testing.T) {
 	month := 11
-	c := cal.NewCalendar(cal.ForMonth(month))
+	c, err := cal.NewCalendar(cal.ForMonth(month))
+	if err != nil {
+		t.Errorf("Unexpected construction error: %s", err.Error())
+		return
+	}
 	want := cal.Calendar{Year: time.Now().Year(), Month: month}
 	if c.Month != want.Month {
 		t.Errorf("Invalid month. Want %d, got %d\n", want.Month, c.Month)
@@ -29,7 +37,11 @@ func TestNewCalendarForMonth(t *testing.T) {
 
 func TestNewCalendarForYear(t *testing.T) {
 	year := 2006
-	c := cal.NewCalendar(cal.ForYear(year))
+	c, err := cal.NewCalendar(cal.ForYear(year))
+	if err != nil {
+		t.Errorf("Unexpected construction error: %s", err.Error())
+		return
+	}
 	want := cal.Calendar{Year: year, Month: int(time.Now().Month())}
 	if c.Year != want.Year {
 		t.Errorf("Invalid year. Want %d, got %d\n", want.Year, c.Year)
@@ -39,10 +51,28 @@ func TestNewCalendarForYear(t *testing.T) {
 	}
 }
 
+func TestNewCalendarWrongMonth(t *testing.T) {
+	_, err := cal.NewCalendar(cal.ForMonth(-1))
+	if err == nil {
+		t.Errorf("Error expected for invalid month but got nil\n")
+	}
+}
+
+func TestNewCalendarWrongYear(t *testing.T) {
+	_, err := cal.NewCalendar(cal.ForYear(0))
+	if err == nil {
+		t.Errorf("Error expected for invalid year but got nil\n")
+	}
+}
+
 func TestNewCalendarForMonthYear(t *testing.T) {
 	year := 2006
 	month := 1
-	c := cal.NewCalendar(cal.ForMonth(month), cal.ForYear(year))
+	c, err := cal.NewCalendar(cal.ForMonth(month), cal.ForYear(year))
+	if err != nil {
+		t.Errorf("Unexpected construction error: %s", err.Error())
+		return
+	}
 	want := cal.Calendar{Year: year, Month: month}
 	if c.Month != want.Month || c.Year != want.Year {
 		t.Errorf("Not expected year/month calendar. Want %v, got %v\n", want, c)
